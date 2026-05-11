@@ -9,7 +9,9 @@
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
+    "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
+    "vercel-build": "drizzle-kit migrate && next build",
     "db:seed": "tsx scripts/seed.ts",
     "worker": "tsx scripts/worker.ts"
   },
