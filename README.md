@@ -61,19 +61,34 @@ Create the database in the [Supabase dashboard](https://supabase.com/dashboard) 
 
 ### 1. Apply schema and connect the app
 
-1. Open **Project Settings → Database** for **`mpvcoxeqmjbhjdhbxkqi`** and copy the **URI** connection string (use the **pooler** / transaction mode host on port **6543** for serverless when recommended for your stack).
-2. URL-encode the password if it contains special characters.
-3. Set **`DATABASE_URL`** in **`web/.env.local`** (local) and in **Vercel** env vars (Production / Preview).
-4. Apply migrations: either rely on **`npm run vercel-build`** on Vercel (`drizzle-kit migrate` then `next build`), or run locally:
+1. Open **Project Settings → Database** for **`mpvcoxeqmjbhjdhbxkqi`** and copy the **URI** connection string (direct or **pooler** on port **6543** for serverless).
+2. Append **`?sslmode=require`** if it is not already in the query string (required for Supabase over the public internet).
+3. URL-encode the password if it contains special characters.
+4. Set **`DATABASE_URL`** in **`web/.env.local`** (local) and in **Vercel → Settings → Environment Variables** for **Production** and **Preview** ( redeploy after saving ).
+5. Apply migrations (pick one):
+
+   **Recommended (CLI)** — creates `public` tables and records them under **`drizzle.__drizzle_migrations`**:
 
    ```bash
    cd web
+   npm install
    npm run db:migrate
    ```
 
-   Alternatively paste or run the SQL under **`web/drizzle/`** in the Supabase SQL editor.
+   **Deploy path** — `npm run vercel-build` runs migrations **before** `next build`. If **`DATABASE_URL` is missing**, the build **fails on purpose** so you do not ship an app without a database.
+
+   **Emergency (SQL Editor only)** — open **`web/drizzle/manual_apply_public_schema.sql`**, paste into **Supabase → SQL → New query → Run**. Then run **`web/drizzle/manual_stamp_drizzle_journal.sql`** so future **`db:migrate`** / deploys do not try to apply migration `0000` twice.
 
 **Note:** An earlier agent session mistakenly documented another Supabase project. **Do not use that project for TDD.** This README targets **`mpvcoxeqmjbhjdhbxkqi`** only.
+
+### Why the `public` schema can stay empty (audit)
+
+| Cause | What to do |
+| --- | --- |
+| **`DATABASE_URL` not set on Vercel** | Migrations never ran during deploy. Add the URI for **`mpvcoxeqmjbhjdhbxkqi`**, redeploy, or run **`npm run db:migrate`** locally. |
+| **URI without TLS** | Add **`?sslmode=require`** (see `.env.example`). |
+| **Only used default `npm run build` locally** | That skips migrations. Use **`npm run db:migrate`** or deploy with **`vercel-build`**. |
+| **Pasted wrong connection string** | Use **Database → Connection string → URI**, not the anon REST URL. |
 
 ### 2. Create the Vercel project
 
@@ -85,7 +100,7 @@ Using the Vercel dashboard (recommended for this repo layout):
 4. **Environment variables** (Production and Preview):
    - `DATABASE_URL` — paste the Supabase Postgres URI.
 
-`web/vercel.json` runs **`npm run vercel-build`**, which applies Drizzle SQL migrations (`drizzle-kit migrate`) then **`next build`**. The first successful deploy therefore creates tables in Supabase.
+`web/vercel.json` runs **`npm run vercel-build`**, which runs **`drizzle-kit migrate`** (via **`scripts/vercel-build.cjs`**) then **`next build`**. The deploy fails fast if **`DATABASE_URL`** is unset so tables are not silently skipped.
 
 5. After the first deployment, **seed demo data once** from your machine (so you do not re-seed on every build):
 
