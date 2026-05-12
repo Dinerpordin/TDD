@@ -51,11 +51,14 @@ The first vertical is **Bangladesh technology** with **English (`en`) and Bengal
 
 There is **no Supabase MCP server** in this environment; database creation is done in the [Supabase dashboard](https://supabase.com/dashboard). The **Vercel MCP** can list teams and projects, but **project creation and Git linking** are done in the Vercel dashboard (or with the Vercel CLI using a token this sandbox does not have).
 
-### 1. Create the Supabase database
+### 1. Supabase database (this repo)
 
-1. In Supabase: **New project** (pick a region close to your audience, for example **Mumbai** for South Asia).
-2. Open **Project Settings → Database** and copy the **URI** connection string (use the **pooler** / transaction mode host on port **6543** for serverless if Supabase recommends it for your driver).
-3. Ensure the password is URL-encoded if it contains special characters.
+The media pipeline schema is applied on Supabase project **`Canal-dashboard`** (`project_ref` **`aeyvydpvrspanearoqhp`**, Postgres host **`db.aeyvydpvrspanearoqhp.supabase.co`**). Migrations recorded: `media_pipeline_01_enums_tables`, `media_pipeline_02_fks_indexes`.
+
+For any **new** Supabase project, create it in the dashboard, then either run `cd web && npm run db:push` / `db:migrate` or apply the SQL under `web/drizzle/`.
+
+1. Open **Project Settings → Database** and copy the **URI** connection string (use the **pooler** / transaction mode host on port **6543** for serverless if Supabase recommends it for your driver).
+2. Ensure the password is URL-encoded if it contains special characters.
 
 ### 2. Create the Vercel project
 
