@@ -49,16 +49,31 @@ The first vertical is **Bangladesh technology** with **English (`en`) and Bengal
 
 ## Deploy on Vercel (with Supabase Postgres)
 
-There is **no Supabase MCP server** in this environment; database creation is done in the [Supabase dashboard](https://supabase.com/dashboard). The **Vercel MCP** can list teams and projects, but **project creation and Git linking** are done in the Vercel dashboard (or with the Vercel CLI using a token this sandbox does not have).
+Use the **TDD** Supabase project for this app (separate from other personal projects):
 
-### 1. Supabase database (this repo)
+| | |
+| --- | --- |
+| **Project ref** | `mpvcoxeqmjbhjdhbxkqi` |
+| **API URL** | `https://mpvcoxeqmjbhjdhbxkqi.supabase.co` |
+| **Postgres host** (direct URI) | `db.mpvcoxeqmjbhjdhbxkqi.supabase.co` |
 
-The media pipeline schema is applied on Supabase project **`Canal-dashboard`** (`project_ref` **`aeyvydpvrspanearoqhp`**, Postgres host **`db.aeyvydpvrspanearoqhp.supabase.co`**). Migrations recorded: `media_pipeline_01_enums_tables`, `media_pipeline_02_fks_indexes`.
+Create the database in the [Supabase dashboard](https://supabase.com/dashboard) if it does not exist yet. **Cursor MCP** for Supabase is configured in **`.cursor/mcp.json`** with `project_ref=mpvcoxeqmjbhjdhbxkqi`. You must complete **OAuth in Cursor** using the **same Supabase account** that owns this project; otherwise MCP tools return permission errors.
 
-For any **new** Supabase project, create it in the dashboard, then either run `cd web && npm run db:push` / `db:migrate` or apply the SQL under `web/drizzle/`.
+### 1. Apply schema and connect the app
 
-1. Open **Project Settings → Database** and copy the **URI** connection string (use the **pooler** / transaction mode host on port **6543** for serverless if Supabase recommends it for your driver).
-2. Ensure the password is URL-encoded if it contains special characters.
+1. Open **Project Settings → Database** for **`mpvcoxeqmjbhjdhbxkqi`** and copy the **URI** connection string (use the **pooler** / transaction mode host on port **6543** for serverless when recommended for your stack).
+2. URL-encode the password if it contains special characters.
+3. Set **`DATABASE_URL`** in **`web/.env.local`** (local) and in **Vercel** env vars (Production / Preview).
+4. Apply migrations: either rely on **`npm run vercel-build`** on Vercel (`drizzle-kit migrate` then `next build`), or run locally:
+
+   ```bash
+   cd web
+   npm run db:migrate
+   ```
+
+   Alternatively paste or run the SQL under **`web/drizzle/`** in the Supabase SQL editor.
+
+**Note:** An earlier agent session mistakenly documented another Supabase project. **Do not use that project for TDD.** This README targets **`mpvcoxeqmjbhjdhbxkqi`** only.
 
 ### 2. Create the Vercel project
 
