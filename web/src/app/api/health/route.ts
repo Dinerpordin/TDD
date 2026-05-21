@@ -12,9 +12,18 @@ export async function GET() {
     .select({ id: drafts.id })
     .from(drafts)
     .where(eq(drafts.status, "in_review"));
+  const raw = process.env.DATABASE_URL ?? "";
+  let dbHost = "missing";
+  try {
+    dbHost = new URL(raw).hostname;
+  } catch {
+    dbHost = raw.startsWith("eyJ") ? "encrypted-reference" : "invalid-url";
+  }
+
   return NextResponse.json({
     ok: true,
     inReviewCount: inReview.length,
-    hasDatabaseUrl: Boolean(process.env.DATABASE_URL),
+    hasDatabaseUrl: Boolean(raw),
+    dbHost,
   });
 }
