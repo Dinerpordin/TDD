@@ -12,6 +12,8 @@ export async function GET() {
     .select({ id: drafts.id })
     .from(drafts)
     .where(eq(drafts.status, "in_review"));
+  const allDrafts = await db.select({ id: drafts.id }).from(drafts);
+  const allTenants = await db.select({ id: tenants.id }).from(tenants);
   const raw = process.env.DATABASE_URL ?? "";
   let dbHost = "missing";
   try {

@@ -4,7 +4,9 @@ import postgres from "postgres";
 import * as schema from "./schema";
 
 export function getDb() {
-  const url = process.env.DATABASE_URL;
+  const url =
+    process.env.DATABASE_URL_UNPOOLED?.trim() ||
+    process.env.DATABASE_URL?.trim();
   if (!url) {
     throw new Error("DATABASE_URL is not set");
   }
