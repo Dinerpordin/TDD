@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 import { getDb } from "@/db";
-import { drafts } from "@/db/schema";
+import { drafts, tenants } from "@/db/schema";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +23,8 @@ export async function GET() {
   return NextResponse.json({
     ok: true,
     inReviewCount: inReview.length,
+    totalDrafts: allDrafts.length,
+    totalTenants: allTenants.length,
     hasDatabaseUrl: Boolean(raw),
     dbHost,
   });
