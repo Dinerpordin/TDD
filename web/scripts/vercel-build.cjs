@@ -29,5 +29,10 @@ if (!url) {
 console.info("[vercel-build] Running drizzle-kit migrate…");
 run("npx", ["drizzle-kit", "migrate"]);
 
+if (process.env.VERCEL_ENV === "production") {
+  console.info("[vercel-build] Seeding production demo data (idempotent)…");
+  run("npx", ["tsx", "scripts/seed.ts"]);
+}
+
 console.info("[vercel-build] Running next build…");
 run("npx", ["next", "build"]);
