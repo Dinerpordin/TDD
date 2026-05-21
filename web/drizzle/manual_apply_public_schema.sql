@@ -1,4 +1,4 @@
--- Manual one-shot apply for Supabase SQL Editor (TDD project ref mpvcoxeqmjbhjdhbxkqi).
+-- Manual one-shot apply for Supabase SQL Editor (TDD project ref cwsycyrrhbxoddvghkah).
 -- Prefer: `cd web && DATABASE_URL='postgresql://...?sslmode=require' npm run db:migrate`
 -- Use this file only when the CLI cannot reach Postgres.
 --

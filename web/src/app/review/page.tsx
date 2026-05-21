@@ -12,6 +12,7 @@ const notoBn = Noto_Sans_Bengali({
 });
 
 export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
 
 export default async function ReviewQueuePage() {
   const db = getDb();

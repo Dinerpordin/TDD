@@ -47,21 +47,40 @@ The first vertical is **Bangladesh technology** with **English (`en`) and Bengal
 
 5. Open [http://localhost:3000/review](http://localhost:3000/review) for the review queue.
 
-## Deploy on Vercel (with Supabase Postgres)
-
-Use the **TDD** Supabase project for this app (separate from other personal projects):
+## Production (live)
 
 | | |
 | --- | --- |
-| **Project ref** | `mpvcoxeqmjbhjdhbxkqi` |
-| **API URL** | `https://mpvcoxeqmjbhjdhbxkqi.supabase.co` |
-| **Postgres host** (direct URI) | `db.mpvcoxeqmjbhjdhbxkqi.supabase.co` |
+| **Vercel project** | [tdd](https://vercel.com/dinerpordins-projects/tdd) (`rootDirectory`: `web`) |
+| **Production URL** | https://tdd-omega.vercel.app |
+| **Review queue** | https://tdd-omega.vercel.app/review |
+| **Git** | Connected to `Dinerpordin/TDD` |
 
-Create the database in the [Supabase dashboard](https://supabase.com/dashboard) if it does not exist yet. **Cursor MCP** for Supabase is configured in **`.cursor/mcp.json`** with `project_ref=mpvcoxeqmjbhjdhbxkqi`. You must complete **OAuth in Cursor** using the **same Supabase account** that owns this project; otherwise MCP tools return permission errors.
+**Postgres:** Vercel **Neon** integration (`neon-amber-jacket`) provisions `DATABASE_URL` on the `tdd` project. After deploy, seed once:
+
+```bash
+cd web
+npx vercel env pull .env.production.local --environment=production --yes
+DOTENV_CONFIG_PATH=.env.production.local npx tsx scripts/seed.ts
+```
+
+## Deploy on Vercel (Supabase Postgres — optional)
+
+Use the **TDD** Supabase project in org **Arionyx** (Cursor MCP + schema):
+
+| | |
+| --- | --- |
+| **Project ref** | `cwsycyrrhbxoddvghkah` |
+| **API URL** | `https://cwsycyrrhbxoddvghkah.supabase.co` |
+| **Postgres host** (direct URI) | `db.cwsycyrrhbxoddvghkah.supabase.co` |
+
+**Cursor MCP** is configured in **`.cursor/mcp.json`** with `project_ref=cwsycyrrhbxoddvghkah`. The older ref `mpvcoxeqmjbhjdhbxkqi` is not on the linked Supabase account.
+
+To use Supabase instead of Neon on Vercel: finish **`vercel integration add supabase`** in the dashboard (browser step), set `DATABASE_URL` to the Supabase URI, remove or override Neon vars, redeploy, then seed as above.
 
 ### 1. Apply schema and connect the app
 
-1. Open **Project Settings → Database** for **`mpvcoxeqmjbhjdhbxkqi`** and copy the **URI** connection string (direct or **pooler** on port **6543** for serverless).
+1. Open **Project Settings → Database** for **`cwsycyrrhbxoddvghkah`** and copy the **URI** connection string (direct or **pooler** on port **6543** for serverless).
 2. Append **`?sslmode=require`** if it is not already in the query string (required for Supabase over the public internet).
 3. URL-encode the password if it contains special characters.
 4. Set **`DATABASE_URL`** in **`web/.env.local`** (local) and in **Vercel → Settings → Environment Variables** for **Production** and **Preview** ( redeploy after saving ).
@@ -79,13 +98,13 @@ Create the database in the [Supabase dashboard](https://supabase.com/dashboard) 
 
    **Emergency (SQL Editor only)** — open **`web/drizzle/manual_apply_public_schema.sql`**, paste into **Supabase → SQL → New query → Run**. Then run **`web/drizzle/manual_stamp_drizzle_journal.sql`** so future **`db:migrate`** / deploys do not try to apply migration `0000` twice.
 
-**Note:** An earlier agent session mistakenly documented another Supabase project. **Do not use that project for TDD.** This README targets **`mpvcoxeqmjbhjdhbxkqi`** only.
+**Note:** Do not use Supabase project `mpvcoxeqmjbhjdhbxkqi` (not on the linked account). Use **`cwsycyrrhbxoddvghkah`** or Neon via Vercel.
 
 ### Why the `public` schema can stay empty (audit)
 
 | Cause | What to do |
 | --- | --- |
-| **`DATABASE_URL` not set on Vercel** | Migrations never ran during deploy. Add the URI for **`mpvcoxeqmjbhjdhbxkqi`**, redeploy, or run **`npm run db:migrate`** locally. |
+| **`DATABASE_URL` not set on Vercel** | Migrations never ran during deploy. Add the URI (Neon or Supabase), redeploy, or run **`npm run db:migrate`** locally. |
 | **URI without TLS** | Add **`?sslmode=require`** (see `.env.example`). |
 | **Only used default `npm run build` locally** | That skips migrations. Use **`npm run db:migrate`** or deploy with **`vercel-build`**. |
 | **Pasted wrong connection string** | Use **Database → Connection string → URI**, not the anon REST URL. |
